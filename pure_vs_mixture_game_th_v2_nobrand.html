@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>เกมพิชิตสารบริสุทธิ์–สารผสม | Kru Pai Classroom</title>
+<style>
+  :root{ --brand:#e63946; --ink:#111; --muted:#666; --card:#f7f7f8; --accent:#1d4ed8; --ok:#16a34a; --bad:#dc2626; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,TH Sarabun New,Prompt,sans-serif;color:var(--ink);background:linear-gradient(180deg,#fff,#f3f4f6)}
+  .wrap{max-width:960px;margin:0 auto;padding:24px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+  .brand{font-weight:800;letter-spacing:.2px;color:var(--brand)}
+  .card{background:var(--card);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.06);padding:20px}
+  h1{font-size:clamp(22px,3.4vw,34px);margin:0 0 6px}
+  h2{font-size:clamp(18px,2.6vw,24px);margin:0 0 12px}
+  p{margin:6px 0;color:var(--muted)}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  input[type=text]{width:260px;padding:12px 14px;border:2px solid #e5e7eb;border-radius:14px;font-size:16px}
+  button{appearance:none;border:0;border-radius:14px;padding:12px 16px;font-weight:700;cursor:pointer}
+  .btn-primary{background:var(--brand);color:#fff}
+  .btn-ghost{background:#fff;border:2px solid #e5e7eb}
+  .btn-next{background:var(--accent);color:#fff}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0 16px;flex-wrap:wrap}
+  .timer{display:flex;align-items:center;gap:10px}
+  .timebar{flex:1;height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+  .timebar>span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444);width:100%}
+  .grid{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
+  .item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:2px solid #e5e7eb;border-radius:14px;padding:12px}
+  .check{--size:24px;min-width:var(--size);height:var(--size);border-radius:8px;border:2px solid #cbd5e1;display:inline-grid;place-items:center;cursor:pointer;user-select:none;flex:0 0 var(--size);font-size:16px}
+  .check.active{background:#0ea5e9;border-color:#0284c7;color:#fff}
+  .note{font-size:13px;color:#475569}
+  .mark-ok{border-color:var(--ok)}
+  .mark-bad{border-color:var(--bad)}
+  .foot{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:12px}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;border:2px solid #e5e7eb}
+  .score{font-size:20px;font-weight:900}
+  .center{text-align:center}
+  .hidden{display:none !important}
+  .two-col{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:720px){.two-col{grid-template-columns:1fr 1fr}}
+  .row-line{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #e5e7eb;border-radius:14px;padding:10px 12px}
+  .row-line .name{font-weight:700}
+  .table{width:100%;border-collapse:separate;border-spacing:0 10px}
+  .table td{padding:10px 12px;background:#fff;border:2px solid #e5e7eb}
+  .table tr td:first-child{border-radius:14px 0 0 14px}
+  .table tr td:last-child{border-radius:0 14px 14px 0}
+  .right{margin-left:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">Kru Pai Classroom</div>
+      <div class="pill"><span>🧪</span><strong>เกมพิชิตสารบริสุทธิ์–สารผสม</strong></div>
+    </div>
+    
+  </header>
+
+  <section id="home" class="card">
+    <h1>พร้อมลุยกันไหม!</h1>
+    <p>โหมด 3 ด่าน • ด่านละ <strong>3 นาที</strong> • คะแนน: ถูก <strong>+2</strong> | ผิด <strong>-1</strong> • ผ่านด่าน ≥ 70%</p>
+    <div class="row" style="margin:10px 0 14px">
+      <input id="player" type="text" placeholder="กรอกชื่อเล่น..." />
+      <button class="btn-primary" id="startBtn">เริ่มเกม ▶</button>
+    </div>
+    <div class="note">ด่าน 1: เลือก “คุณสมบัติสารบริสุทธิ์” • ด่าน 2: เลือก “คุณสมบัติสารผสม” • ด่าน 3: กดเลือก บริสุทธิ์/ผสม ให้ถูก</div>
+  </section>
+
+  <section id="play" class="card hidden">
+    <div class="toolbar">
+      <div>
+        <h2 id="roundTitle">ด่าน 1 • คุณสมบัติของสารบริสุทธิ์</h2>
+        <div class="note" id="roundHint">จงติ๊กเฉพาะข้อที่เป็น “สารบริสุทธิ์”</div>
+      </div>
+      <div class="timer" style="min-width:220px;">
+        <div class="timebar"><span id="timebar"></span></div>
+        <div class="pill"><strong id="clock">03:00</strong></div>
+      </div>
+      <div class="pill right hidden" id="roundScorePill">คะแนนด่านนี้: <b id="roundScoreText">0/0</b></div>
+      <div class="pill right hidden" id="passNote"></div>
+    </div>
+
+    <div id="round1" class="grid"></div>
+    <div id="round2" class="grid hidden"></div>
+    <div id="round3" class="two-col hidden"></div>
+
+    <div class="foot">
+      <button class="btn-ghost" id="resetBtn">รีเซ็ตด่าน</button>
+      <button class="btn-primary" id="submitBtn">ตรวจคำตอบ ✅</button>
+      <button class="btn-next hidden" id="nextBtn">ไปด่านถัดไป ➜</button>
+    </div>
+  </section>
+
+  <section id="summary" class="card hidden center">
+    <h2>สรุปผล • <span id="playerName">ผู้เล่น</span></h2>
+    <div class="score">คะแนนรวม: <span id="totalScore">0</span> / <span id="totalMax">0</span> (<span id="totalPercent">0</span>%)</div>
+    <table class="table" style="margin-top:10px">
+      <tr><td>ด่าน 1 • คุณสมบัติสารบริสุทธิ์</td><td id="t1">0</td></tr>
+      <tr><td>ด่าน 2 • คุณสมบัติสารผสม</td><td id="t2">0</td></tr>
+      <tr><td>ด่าน 3 • บริสุทธิ์/ผสม ต่อชื่อสาร</td><td id="t3">0</td></tr>
+      <tr><td><strong>รวม</strong></td><td id="t4"><strong>0</strong></td></tr>
+    </table>
+    <div id="historyBlock" class="seg hidden">
+      <h3 style="margin:8px 0">ประวัติการเล่นย้อนหลัง</h3>
+      <table class="table" id="historyTable"></table>
+    </div>
+    <div class="foot center" style="justify-content:center">
+      <button class="btn-primary" id="replay">เล่นอีกครั้ง 🔁</button>
+    </div>
+  </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const $ = (q)=>document.querySelector(q);
+  const el = (tag, cls, html)=>{ const d=document.createElement(tag); if(cls) d.className=cls; if(html!==undefined) d.innerHTML=html; return d; };
+  const shuffle = (arr)=>arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(p=>p[1]);
+
+  // ---------- ข้อมูลด่าน ----------
+  const pureProps = [
+    ["ประกอบด้วยอนุภาคชนิดเดียว (ธาตุหรือสารประกอบ)", true],
+    ["มีจุดเดือดคงที่ (เมื่อความดันคงที่)", true],
+    ["มีจุดหลอมเหลวคงที่", true],
+    ["สัดส่วนองค์ประกอบคงที่ตามสูตรเคมี", true],
+    ["สมบัติทางกายภาพคงที่", true],
+    ["มีสูตรเคมีเฉพาะแน่นอน", true],
+    ["แยกด้วยวิธีทางกายภาพได้ง่าย", false],
+    ["จุดเดือดเปลี่ยนตามสัดส่วนองค์ประกอบ", false],
+    ["ประกอบด้วยสารมากกว่าหนึ่งชนิด", false],
+    ["ไม่มีสูตรเคมีแน่นอน", false],
+  ];
+  const mixProps = [
+    ["ประกอบด้วยสารตั้งแต่ 2 ชนิดขึ้นไป", true],
+    ["สัดส่วนองค์ประกอบเปลี่ยนแปลงได้", true],
+    ["จุดเดือด/จุดหลอมเหลวไม่คงที่", true],
+    ["แยกได้ด้วยวิธีทางกายภาพ (เช่น กรอง, กลั่น, แยกด้วยแม่เหล็ก)", true],
+    ["แบ่งเป็นสารเนื้อเดียวและสารเนื้อผสม", true],
+    ["สมบัติขึ้นกับสัดส่วนองค์ประกอบ", true],
+    ["มีสูตรเคมีไม่แน่นอน", true],
+    ["ตัวอย่าง: อากาศ น้ำเกลือ เหล็กกล้า", true],
+    ["สามารถกรองแยกอนุภาคบางชนิดได้", true],
+    ["มีองค์ประกอบชนิดเดียว", false],
+  ];
+  const substances = [
+    ["น้ำกลั่น", "pure"],
+    ["น้ำทะเล", "mix"],
+    ["น้ำส้มคั้น", "mix"],
+    ["อากาศ", "mix"],
+    ["ออกซิเจน", "pure"],
+    ["เหล็ก", "pure"],
+    ["เหล็กกล้า", "mix"],
+    ["น้ำเกลือ", "mix"],
+    ["ซูโครส", "pure"],
+    ["คาร์บอนไดออกไซด์", "pure"],
+  ];
+
+  const MAX1 = pureProps.filter(x=>x[1]).length * 2;   // 12
+  const MAX2 = mixProps.filter(x=>x[1]).length * 2;    // 18
+  const MAX3 = substances.length * 2;                  // 20
+  const TOTAL_MAX = MAX1 + MAX2 + MAX3;                // 50
+
+  let currentRound = 1;
+  let scores = {1:0,2:0,3:0};
+  let timer = null;
+  const ROUND_SECONDS = 180;
+  let left = ROUND_SECONDS;
+
+  // --- ประวัติคะแนนรวม (Summary เท่านั้น) ---
+  let gameHistory = [];
+  const HISTORY_KEY = 'kp_history_pure_mix';
+  try { const raw = localStorage.getItem(HISTORY_KEY); if(raw) gameHistory = JSON.parse(raw); } catch(e) {}
+  function saveHistory(){ try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(gameHistory)); }catch(e){} }
+  function renderHistory(){
+    const blk = $('#historyBlock');
+    const tbl = $('#historyTable');
+    if(!gameHistory.length){ blk.classList.add('hidden'); return; }
+    blk.classList.remove('hidden');
+    tbl.innerHTML = '';
+    const head = document.createElement('tr');
+    head.innerHTML = '<td><b>รอบ</b></td><td><b>ด่าน 1</b></td><td><b>ด่าน 2</b></td><td><b>ด่าน 3</b></td><td><b>รวม</b></td><td><b>%</b></td>';
+    tbl.appendChild(head);
+    gameHistory.forEach((h,idx)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>'+ (idx+1) +'</td><td>'+h.s1+'</td><td>'+h.s2+'</td><td>'+h.s3+'</td><td>'+h.total+'</td><td>'+h.percent+'%</td>';
+      tbl.appendChild(tr);
+    });
+  }
+
+  function buildPropRound(containerId, data){
+    const box = $(containerId); box.innerHTML='';
+    shuffle(data).forEach((pair, idx)=>{
+      const text = pair[0], isTrue = pair[1];
+      const row = el('div','item');
+      const boxBtn = el('div','check'); boxBtn.setAttribute('role','checkbox'); boxBtn.dataset.answer = isTrue ? 'true' : 'false';
+      boxBtn.addEventListener('click', ()=> boxBtn.classList.toggle('active'));
+      const txt = el('div','', '<div><strong>'+(idx+1)+'.</strong> '+text+'</div><div class="note">ติ๊กถ้าคิดว่าใช่</div>');
+      row.appendChild(boxBtn); row.appendChild(txt);
+      box.appendChild(row);
+    });
+  }
+  function buildSubstanceRound(){
+    const box = $('#round3'); box.innerHTML='';
+    shuffle(substances).forEach((pair, i)=>{
+      const name = pair[0], key = pair[1];
+      const row = el('div','row-line');
+      const title = el('div','name', '<span>'+(i+1)+'.</span> '+name);
+      const ops = el('div','', '<label class="opt"><input type="radio" name="s'+i+'" value="pure"> บริสุทธิ์</label> <label class="opt"><input type="radio" name="s'+i+'" value="mix"> ผสม</label>');
+      row.dataset.answer = key;
+      row.appendChild(title); row.appendChild(ops);
+      box.appendChild(row);
+    });
+  }
+
+  function startTimer(){
+    clearInterval(timer);
+    left = ROUND_SECONDS; updateClock();
+    timer = setInterval(()=>{
+      left--; updateClock();
+      if(left<=0){ clearInterval(timer); autoSubmit(); }
+    },1000);
+  }
+  function updateClock(){
+    const m = String(Math.floor(left/60)).padStart(2,'0');
+    const s = String(left%60).padStart(2,'0');
+    $('#clock').textContent = m+':'+s;
+    $('#timebar').style.width = Math.max(0, left/ROUND_SECONDS*100)+'%';
+  }
+
+  function gradeRound(){
+    let earned = 0, max = 0;
+    scores[currentRound] = 0; // reset this round score before grading
+    if(currentRound===1 || currentRound===2){
+      const container = currentRound===1 ? '#round1' : '#round2';
+      max = currentRound===1 ? MAX1 : MAX2;
+      document.querySelectorAll(container+' .item').forEach(item=>{
+        const boxBtn = item.querySelector('.check');
+        const picked = boxBtn.classList.contains('active');
+        const isTrue = (boxBtn.dataset.answer==='true');
+        if(picked && isTrue){ earned += 2; item.classList.add('mark-ok'); }
+        if(picked && !isTrue){ earned -= 1; item.classList.add('mark-bad'); }
+      });
+      scores[currentRound] = earned;
+    }else{
+      max = MAX3;
+      document.querySelectorAll('#round3 .row-line').forEach(row=>{
+        const ans = row.dataset.answer;
+        const radios = row.querySelectorAll('input[type=radio]');
+        let picked = null; radios.forEach(r=>{ if(r.checked) picked = r.value; });
+        if(!picked) return;
+        if(picked===ans){ earned += 2; row.classList.add('mark-ok'); }
+        else{ earned -= 1; row.classList.add('mark-bad'); }
+      });
+      scores[3] = earned;
+    }
+    return {earned, max};
+  }
+
+  function showRoundScore(earned, max){
+    $('#roundScoreText').textContent = earned + '/' + max;
+    $('#roundScorePill').classList.remove('hidden');
+  }
+
+  function lockRound(canNext){
+    $('#submitBtn').classList.add('hidden');
+    const note = $('#passNote');
+    if(canNext){
+      $('#nextBtn').classList.remove('hidden');
+      note.textContent = 'ผ่านเกณฑ์ 70% ✓ ไปด่านถัดไปได้';
+      note.classList.remove('hidden');
+    }else{
+      $('#nextBtn').classList.add('hidden');
+      note.textContent = 'ยังไม่ถึง 70% → กดรีเซ็ตแล้วลองใหม่';
+      note.classList.remove('hidden');
+    }
+    if(currentRound===1 || currentRound===2){
+      document.querySelectorAll((currentRound===1?'#round1':'#round2')+' .check').forEach(c=> c.style.pointerEvents='none');
+    }else{
+      document.querySelectorAll('#round3 input[type=radio]').forEach(r=> r.disabled = true);
+    }
+  }
+
+  function autoSubmit(){
+    if($('#play').classList.contains('hidden')) return;
+    const res = gradeRound();
+    showRoundScore(res.earned, res.max);
+    const pass = res.earned >= Math.ceil(0.7*res.max);
+    lockRound(pass);
+  }
+
+  function showRound(n){
+    currentRound = n;
+    $('#roundScorePill').classList.add('hidden');
+    $('#passNote').classList.add('hidden');
+    $('#roundTitle').textContent = (n===1?'ด่าน 1 • คุณสมบัติของสารบริสุทธิ์': n===2?'ด่าน 2 • คุณสมบัติของสารผสม':'ด่าน 3 • บริสุทธิ์ / ผสม ต่อชื่อสาร');
+    $('#roundHint').textContent = (n===1?'จงติ๊กเฉพาะข้อที่เป็น “สารบริสุทธิ์”': n===2?'จงติ๊กเฉพาะข้อที่เป็น “สารผสม”':'เลือกให้ถูกว่าแต่ละรายการเป็น “บริสุทธิ์” หรือ “ผสม”');
+    $('#round1').classList.toggle('hidden', n!==1);
+    $('#round2').classList.toggle('hidden', n!==2);
+    $('#round3').classList.toggle('hidden', n!==3);
+    $('#submitBtn').classList.remove('hidden');
+    $('#nextBtn').classList.add('hidden');
+    document.querySelectorAll('.mark-ok,.mark-bad').forEach(e=>{ e.classList.remove('mark-ok','mark-bad'); });
+    if(n===1){ buildPropRound('#round1', pureProps); }
+    if(n===2){ buildPropRound('#round2', mixProps); }
+    if(n===3){ buildSubstanceRound(); }
+    startTimer();
+  }
+
+  // Events
+  $('#startBtn').addEventListener('click', ()=>{
+    const name = $('#player').value.trim() || 'นักผจญภัย';
+    $('#playerName').textContent = name;
+    $('#home').classList.add('hidden');
+    $('#play').classList.remove('hidden');
+    scores = {1:0,2:0,3:0};
+    showRound(1);
+    renderHistory();
+  });
+
+  $('#submitBtn').addEventListener('click', ()=>{
+    clearInterval(timer);
+    const res = gradeRound();
+    showRoundScore(res.earned, res.max);
+    const pass = res.earned >= Math.ceil(0.7*res.max);
+    lockRound(pass);
+  });
+
+  $('#nextBtn').addEventListener('click', ()=>{
+    if(currentRound<3){ showRound(currentRound+1); }
+    else{
+      const total = scores[1]+scores[2]+scores[3];
+      const percent = Math.max(0, Math.round(total/TOTAL_MAX*100));
+      $('#totalScore').textContent = total;
+      $('#totalMax').textContent = TOTAL_MAX;
+      $('#totalPercent').textContent = percent;
+      $('#t1').textContent = scores[1]+' / '+MAX1;
+      $('#t2').textContent = scores[2]+' / '+MAX2;
+      $('#t3').textContent = scores[3]+' / '+MAX3;
+      $('#t4').textContent = total+' / '+TOTAL_MAX+' ('+percent+'%)';
+      gameHistory.push({ s1: scores[1]+' / '+MAX1, s2: scores[2]+' / '+MAX2, s3: scores[3]+' / '+MAX3, total: total+' / '+TOTAL_MAX, percent });
+      saveHistory(); renderHistory();
+      $('#play').classList.add('hidden'); $('#summary').classList.remove('hidden');
+    }
+  });
+
+  $('#resetBtn').addEventListener('click', ()=>{
+    scores[currentRound] = 0;
+    if(currentRound===1) buildPropRound('#round1', pureProps);
+    if(currentRound===2) buildPropRound('#round2', mixProps);
+    if(currentRound===3) buildSubstanceRound();
+    document.querySelectorAll('.mark-ok,.mark-bad').forEach(e=>{ e.classList.remove('mark-ok','mark-bad'); });
+    $('#submitBtn').classList.remove('hidden');
+    $('#nextBtn').classList.add('hidden');
+    $('#roundScorePill').classList.add('hidden');
+    $('#passNote').classList.add('hidden');
+    startTimer();
+  });
+
+  $('#replay').addEventListener('click', ()=>{
+    $('#summary').classList.add('hidden');
+    $('#home').classList.remove('hidden');
+    renderHistory();
+  });
+
+  document.addEventListener('mousedown', e=>{ if(e.detail>1) e.preventDefault(); }, false);
+});
+</script>
+</body>
+</html>
